@@ -37,3 +37,54 @@ with open("test/fixtures/emeans-faiss-reference.json", "w") as f:
 
 print("Wrote test/fixtures/emeans-faiss-reference.json")
 print("Loss per epoch:", fixture["lossPerEpoch"])
+
+# --- Harder fixture ---------------------------------------------------------
+# The fixture above is too easy to discriminate correct vs. wrong implementations:
+# inter-cluster separation (10 units) is ~40x the per-cluster noise std (0.25), so
+# almost any non-catastrophic clustering lands at nearly the same loss. It's also
+# d=2, which means NO_REVIVAL_MAX_D disables dead-cluster revival on both the faiss
+# side and our port's side, so reviveUnused()/split logic is never exercised.
+#
+# This harder fixture uses d=8 (> NO_REVIVAL_MAX_D, so revival is active on both
+# sides), 6 true Gaussian blobs with centers only ~1.4-3.0 noise stds apart
+# (meaningfully overlapping, not ~40 sigma apart), and k=8 (more clusters than true
+# structure) so dead-cluster revival actually fires during training, not just in
+# principle. See task-7-report.md for the empirical validation of the tolerance
+# chosen in the accompanying test.
+hard_dim = 8
+hard_k_true = 6
+hard_noise_std = 1.0
+hard_center_scale = 0.625
+hard_n_per_cluster = 200
+hard_k = 8
+
+hard_rng = np.random.RandomState(42)
+hard_centers = hard_rng.normal(
+    scale=hard_center_scale, size=(hard_k_true, hard_dim)
+).astype("float32")
+hard_data = np.concatenate(
+    [
+        c + hard_rng.normal(scale=hard_noise_std, size=(hard_n_per_cluster, hard_dim)).astype("float32")
+        for c in hard_centers
+    ]
+)
+
+hard_model = NumpyEmeans(d=hard_dim, k=hard_k, nepochs=5, seed=42)
+hard_centroids, hard_labels = hard_model.train(hard_data)
+
+hard_fixture = {
+    "data": hard_data.tolist(),
+    "dim": hard_dim,
+    "k": hard_k,
+    "nepochs": 5,
+    "seed": 42,
+    "finalLoss": float(hard_model.obj[-1]),
+    "lossPerEpoch": hard_model.obj.tolist(),
+}
+
+with open("test/fixtures/emeans-faiss-reference-hard.json", "w") as f:
+    json.dump(hard_fixture, f, indent=2)
+
+print("Wrote test/fixtures/emeans-faiss-reference-hard.json")
+print("Hard loss per epoch:", hard_fixture["lossPerEpoch"])
+print("Hard cluster usage counts:", np.bincount(hard_labels, minlength=hard_k))
