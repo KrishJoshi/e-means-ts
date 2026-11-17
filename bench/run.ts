@@ -39,8 +39,9 @@ function run(n: number, dim: number, k: number): void {
   const kmeansResult = kmeans(data, dim, k, { seed: 1, maxEpochs: 25 })
   const kmeansMs = performance.now() - kmeansStart
 
+  const points = toPoints(data, dim)
   const mlStart = performance.now()
-  const mlResult = mlKmeans(toPoints(data, dim), k, {
+  const mlResult = mlKmeans(points, k, {
     initialization: 'kmeans++',
     maxIterations: 25,
   })
