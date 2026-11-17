@@ -17,7 +17,7 @@ const STOPWORDS = new Set([
   'then', 'our', 'their', 'which', 'or', 'was', 'they', 'from', 'at',
   'more', 'than', 'would', 'am', 'did', 'an', 'now', 'come', 'like',
 ])
-const VOCAB_SIZE = 600
+const VOCAB_SIZE = 25000 // effectively "all of it" -- Shakespeare's complete works have ~23,700 unique words (4+ letters)
 
 function topWords(text: string): string[] {
   const counts = new Map<string, number>()

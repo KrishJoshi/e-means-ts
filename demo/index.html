@@ -85,10 +85,10 @@
           </div>
           <div class="feature-card">
             <div class="feature-icon">&#9889;</div>
-            <h3>Fewer epochs, same loss</h3>
+            <h3>2&ndash;4&times; faster than k-means</h3>
             <p>
               An EMA-based mini-batch update reaches k-means-quality
-              clustering in a fraction of the passes over your data.
+              clustering in a fifth of the epochs — see it race live below.
             </p>
           </div>
           <div class="feature-card">
@@ -121,11 +121,13 @@
 
     <section class="demo-section" id="demo">
       <div class="shell section-inner">
-        <h2>Watch it cluster</h2>
+        <h2>Watch e-means win the race</h2>
         <p class="section-lede">
-          Real word embeddings from Shakespeare's complete works, clustered
-          live in your browser. Same data, same number of clusters, same
-          initialization — e-means just gets there in fewer passes.
+          18,396 word embeddings — the (nearly) full vocabulary of
+          Shakespeare's complete works — clustered live in your browser.
+          Same data, same number of clusters, same starting point — scrub
+          the slider or hit play to watch e-means finish while k-means is
+          still working.
         </p>
         <div id="app"></div>
       </div>
@@ -135,23 +137,24 @@
       <div class="shell section-inner">
         <h2>The numbers</h2>
         <p class="section-lede">
-          e-means (5 epochs) vs. this package's own Lloyd's k-means (run to
-          convergence, up to 25 epochs), same k-means++ initialization, on
-          the 592-word / 50-dimension Shakespeare embeddings used in the demo
-          above.
+          e-means (5 epochs) vs. this package's own Lloyd's k-means (up to
+          25 epochs), same k-means++ initialization, on the 18,396-word /
+          50-dimension Shakespeare embeddings used in the demo above.
+          k-means uses its full epoch budget here and still doesn't beat
+          e-means's loss.
         </p>
         <div class="stat-grid">
           <div class="stat-card">
-            <span class="stat-value">&le; 2.5%</span>
-            <span class="stat-label">loss difference vs. k-means</span>
+            <span class="stat-value">3.7&ndash;4.6&times;</span>
+            <span class="stat-label">faster wall-clock</span>
           </div>
           <div class="stat-card">
             <span class="stat-value">5</span>
-            <span class="stat-label">epochs needed (vs. 21&ndash;23)</span>
+            <span class="stat-label">epochs needed (vs. 25)</span>
           </div>
           <div class="stat-card">
-            <span class="stat-value">1&ndash;3&times;</span>
-            <span class="stat-label">faster wall-clock</span>
+            <span class="stat-value">&le; 0.3%</span>
+            <span class="stat-label">loss difference vs. k-means</span>
           </div>
         </div>
         <p class="benchmark-note">

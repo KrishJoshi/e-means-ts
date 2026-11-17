@@ -402,6 +402,56 @@ canvas {
   width: 4rem;
 }
 
+.epoch-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  justify-content: center;
+  max-width: 600px;
+  margin: 0.5rem auto 0;
+}
+
+.play-btn {
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--ink);
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.play-btn:hover {
+  background: #000;
+}
+
+.epoch-controls input[type='range'] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.epoch-label {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  min-width: 7rem;
+  text-align: right;
+}
+
+.loading-note {
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 #tooltip {
   position: fixed;
   background: var(--ink);

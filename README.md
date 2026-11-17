@@ -81,19 +81,19 @@ not a bug in this port.
 ### Real embeddings (the actual use case)
 
 `e-means` (5 epochs) vs. this package's own `kmeans` (Lloyd's, run to
-convergence) on the 592-word / 50-dimension Shakespeare embeddings used in
+convergence) on the 18,396-word / 50-dimension Shakespeare embeddings
+(the nearly-complete vocabulary of Shakespeare's complete works) used in
 the live demo (linked below), both with `init: 'kmeans++'`, Node.js:
 
 | k | e-means | kmeans (ours) | loss ratio | speedup |
 |---|---------|----------------|------------|---------|
-| 8 | 5 epochs, 5.0ms, loss=6,757.8 | 23 epochs, 5.1ms, loss=6,752.8 | 1.001 | 1.0x |
-| 16 | 5 epochs, 3.2ms, loss=6,156.9 | 22 epochs, 9.3ms, loss=6,006.5 | 1.025 | 2.9x |
-| 24 | 5 epochs, 4.3ms, loss=5,679.5 | 21 epochs, 12.9ms, loss=5,676.3 | 1.001 | 3.0x |
+| 10 | 5 epochs, 51.9ms, loss=284,270.9 | 25 epochs, 191.1ms, loss=284,992.3 | 0.997 | 3.7x |
+| 14 | 5 epochs, 62.8ms, loss=276,192.4 | 25 epochs, 253.5ms, loss=275,889.7 | 1.001 | 4.0x |
+| 20 | 5 epochs, 85.5ms, loss=266,271.1 | 25 epochs, 393.2ms, loss=266,036.8 | 1.001 | 4.6x |
 
-e-means matches k-means's loss within 0.1–2.5% using roughly a quarter of
-the epochs, and comes out ahead on wall-clock once there's enough data per
-epoch for the mini-batching to pay for itself (small `k`/small data favors
-plain Lloyd's, since it has less per-epoch overhead to begin with).
+k-means uses its full 25-epoch budget here and still doesn't beat
+e-means's loss — e-means matches it within 0.3% using a fifth of the
+epochs and 3.7-4.6x less wall-clock time.
 
 ### Synthetic blobs (a harder case for e-means, included for transparency)
 
