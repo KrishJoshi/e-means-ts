@@ -2,6 +2,7 @@ import { assignBatch } from './assign'
 import { kmeansPlusPlusInit } from './kmeansPlusPlus'
 import { seededPermutation } from './rng'
 import type { ClusterResult, KMeansOptions } from './types'
+import { assertValidClusteringInput } from './validate'
 
 function randomInit(
   data: Float32Array,
@@ -32,7 +33,7 @@ export function kmeans(
   k: number,
   opts: KMeansOptions = {}
 ): ClusterResult {
-  const n = data.length / dim
+  const n = assertValidClusteringInput(data, dim, k)
   const seed = opts.seed ?? 1234
   const maxEpochs = opts.maxEpochs ?? 25
   const init = opts.init ?? 'kmeans++'

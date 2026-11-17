@@ -12,6 +12,7 @@ import {
 } from './emeansSchedule'
 import { mulberry32, seededPermutation } from './rng'
 import type { ClusterResult, EMeansOptions } from './types'
+import { assertValidClusteringInput, assertValidPredictInput } from './validate'
 
 interface EMeansState {
   dim: number
@@ -138,7 +139,7 @@ export function fit(
   k: number,
   opts: EMeansOptions = {}
 ): ClusterResult {
-  const n = data.length / dim
+  const n = assertValidClusteringInput(data, dim, k)
   const seed = opts.seed ?? 1234
   const nepochs = Math.max(1, Math.floor(opts.nepochs ?? 5))
   const init = opts.init ?? 'random'
@@ -146,6 +147,11 @@ export function fit(
   const batchLaw = resolveBatchLaw(opts.batchLaw ?? 'auto', dim)
   const unusedThreshold = resolveUnusedThreshold(opts.unusedThreshold, dim)
   const { batchSize, alpha0 } = resolveRecipe(n, k, nepochs, batchLaw, opts.batchSize, opts.alpha0)
+  if (batchSize <= 0) {
+    throw new Error(
+      `batchSize must resolve to a positive integer, got ${batchSize}; check the batchSize option`
+    )
+  }
 
   const centroids =
     init === 'kmeans++'
@@ -207,6 +213,7 @@ export function fit(
 }
 
 export function predict(data: Float32Array, dim: number, centroids: Float32Array): Int32Array {
+  assertValidPredictInput(data, dim, centroids)
   const n = data.length / dim
   const k = centroids.length / dim
   const allIndices = new Int32Array(n)

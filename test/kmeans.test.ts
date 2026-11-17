@@ -38,3 +38,20 @@ describe('kmeans', () => {
     expect(Array.from(a.labels)).toEqual(Array.from(b.labels))
   })
 })
+
+describe('kmeans input validation', () => {
+  it('throws when data.length is not divisible by dim', () => {
+    expect(() => kmeans(new Float32Array([1, 2, 3]), 2, 1)).toThrow()
+  })
+
+  it('throws when k <= 0', () => {
+    const { data, dim } = makeBlobs()
+    expect(() => kmeans(data, dim, 0)).toThrow()
+    expect(() => kmeans(data, dim, -1)).toThrow()
+  })
+
+  it('throws when k > n', () => {
+    const { data, dim } = makeBlobs()
+    expect(() => kmeans(data, dim, 10_000)).toThrow()
+  })
+})

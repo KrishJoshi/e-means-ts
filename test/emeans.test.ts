@@ -58,4 +58,43 @@ describe('predict', () => {
     const labels = predict(query, dim, centroids)
     expect(labels.length).toBe(1)
   })
+
+  it('throws when data.length is not divisible by dim', () => {
+    const centroids = new Float32Array([0, 0, 1, 1])
+    expect(() => predict(new Float32Array([1, 2, 3]), 2, centroids)).toThrow()
+  })
+
+  it('throws when centroids.length is not divisible by dim', () => {
+    const centroids = new Float32Array([0, 0, 1])
+    expect(() => predict(new Float32Array([1, 2]), 2, centroids)).toThrow()
+  })
+})
+
+describe('fit input validation', () => {
+  const { data, dim } = makeBlobs()
+
+  it('throws when data.length is not divisible by dim', () => {
+    expect(() => fit(new Float32Array([1, 2, 3]), 2, 1)).toThrow()
+  })
+
+  it('throws when k <= 0', () => {
+    expect(() => fit(data, dim, 0)).toThrow()
+    expect(() => fit(data, dim, -1)).toThrow()
+  })
+
+  it('throws when k > n', () => {
+    expect(() => fit(data, dim, 10_000)).toThrow()
+  })
+
+  it('throws when batchSize is 0', () => {
+    expect(() => fit(data, dim, 4, { batchSize: 0 })).toThrow()
+  })
+
+  it('throws when batchSize is fractional and floors to 0', () => {
+    expect(() => fit(data, dim, 4, { batchSize: 0.5 })).toThrow()
+  })
+
+  it('throws when batchSize is negative', () => {
+    expect(() => fit(data, dim, 4, { batchSize: -5 })).toThrow()
+  })
 })
