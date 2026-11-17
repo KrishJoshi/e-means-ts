@@ -210,4 +210,7 @@ this release. See `docs/design/2026-11-17-e-means-ts-design.md` for why.
 
 ## License
 
-MIT
+MIT. The e-means scaling-law constants in `src/emeansSchedule.ts` are
+derived from Meta Platforms, Inc.'s MIT-licensed
+[faiss](https://github.com/facebookresearch/faiss) project -- see
+[`NOTICE`](./NOTICE) for the full attribution.

@@ -1,3 +1,11 @@
+// One-time script: builds src/data/shakespeare-embeddings.json for the demo
+// from two inputs that aren't committed to the repo (see .gitignore). Fetch
+// them before running `npm run build:data`:
+//
+//   mkdir -p demo/scripts/.cache
+//   curl -o demo/scripts/.cache/shakespeare.txt https://www.gutenberg.org/files/100/100-0.txt
+//   curl -o demo/scripts/.cache/glove.zip https://nlp.stanford.edu/data/glove.6B.zip
+//   cd demo/scripts/.cache && unzip -o glove.zip glove.6B.50d.txt && cd ../../..
 import { createReadStream, readFileSync, writeFileSync } from 'node:fs'
 import { createInterface } from 'node:readline'
 
