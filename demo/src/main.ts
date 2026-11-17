@@ -20,14 +20,10 @@ const shakespeareFlat = new Float32Array(shakespearePoints.flatMap((p) => p.vect
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 app.innerHTML = `
-  <header>
-    <h1>e-means vs k-means</h1>
-    <p>Same data, same number of clusters. e-means gets there in far fewer epochs.</p>
-    <nav>
-      <button data-tab="shakespeare" class="active">Shakespeare word cloud</button>
-      <button data-tab="custom">Bring your own data</button>
-    </nav>
-  </header>
+  <nav id="demo-nav">
+    <button data-tab="shakespeare" class="active">Shakespeare word cloud</button>
+    <button data-tab="custom">Bring your own data</button>
+  </nav>
   <section id="shakespeare-tab">
     <button id="run-shakespeare">Run the race</button>
     <div class="race">
@@ -161,13 +157,36 @@ function runRace(
   kmeansStats.textContent = `${kmeansResult.epochs} epochs - ${kmeansMs.toFixed(0)}ms - loss ${kmeansResult.loss.toFixed(1)}`
 }
 
-document.querySelectorAll<HTMLButtonElement>('nav button').forEach((button) => {
+document.querySelectorAll<HTMLButtonElement>('#demo-nav button').forEach((button) => {
   button.addEventListener('click', () => {
-    document.querySelectorAll('nav button').forEach((b) => b.classList.remove('active'))
+    document.querySelectorAll('#demo-nav button').forEach((b) => b.classList.remove('active'))
     button.classList.add('active')
     const tab = button.dataset.tab
     document.querySelector<HTMLElement>('#shakespeare-tab')!.hidden = tab !== 'shakespeare'
     document.querySelector<HTMLElement>('#custom-tab')!.hidden = tab !== 'custom'
+  })
+})
+
+document.querySelectorAll<HTMLButtonElement>('.copy-btn').forEach((button) => {
+  button.addEventListener('click', () => {
+    const text = button.dataset.copy ?? button.parentElement?.querySelector('code')?.textContent ?? ''
+    navigator.clipboard.writeText(text).then(() => {
+      const original = button.textContent
+      button.textContent = 'Copied!'
+      setTimeout(() => {
+        button.textContent = original
+      }, 1500)
+    })
+  })
+})
+
+document.querySelectorAll<HTMLButtonElement>('.code-tab-btn').forEach((button) => {
+  button.addEventListener('click', () => {
+    const target = button.dataset.codeTab
+    document.querySelectorAll('.code-tab-btn').forEach((b) => b.classList.remove('active'))
+    document.querySelectorAll('.code-tab-panel').forEach((p) => p.classList.remove('active'))
+    button.classList.add('active')
+    document.querySelector(`[data-code-panel="${target}"]`)?.classList.add('active')
   })
 })
 

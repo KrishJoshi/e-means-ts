@@ -2,12 +2,269 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>e-means vs k-means: fewer epochs, same loss</title>
+    <title>e-means — fast, zero-dependency clustering for TypeScript</title>
+    <meta
+      name="description"
+      content="A zero-dependency TypeScript port of e-means, Meta FAIR's mini-batch replacement for k-means. Validated against the real faiss implementation. Runs in Node, the browser, and edge runtimes."
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <div id="app"></div>
+    <nav class="topnav">
+      <div class="shell topnav-inner">
+        <a class="brand" href="#top">e<span class="accent">·</span>means</a>
+        <div class="topnav-links">
+          <a href="#features">Features</a>
+          <a href="#demo">Demo</a>
+          <a href="#benchmarks">Benchmarks</a>
+          <a href="#usage">Usage</a>
+          <a
+            class="topnav-github"
+            href="https://github.com/TODO-set-after-repo-creation/e-means-ts"
+            >GitHub</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero" id="top">
+      <div class="shell hero-inner">
+        <p class="eyebrow">TypeScript · zero dependencies · MIT licensed</p>
+        <h1>Fast clustering,<br />without the Python.</h1>
+        <p class="hero-sub">
+          A clean TypeScript port of <strong>e-means</strong> — Meta FAIR's
+          mini-batch replacement for k-means — validated against the real
+          faiss implementation. Runs in Node, the browser, and edge runtimes
+          where faiss can't.
+        </p>
+        <div class="hero-actions">
+          <div class="install-box">
+            <span class="install-prompt">$</span>
+            <code>npm install e-means</code>
+            <button
+              class="copy-btn"
+              data-copy="npm install e-means"
+              type="button"
+              aria-label="Copy install command"
+            >
+              Copy
+            </button>
+          </div>
+          <div class="hero-buttons">
+            <a href="#demo" class="btn btn-primary">See it run &rarr;</a>
+            <a
+              href="https://github.com/TODO-set-after-repo-creation/e-means-ts"
+              class="btn btn-ghost"
+              >View source</a
+            >
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="features" id="features">
+      <div class="shell section-inner">
+        <h2>Why e-means</h2>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">0</div>
+            <h3>Zero dependencies</h3>
+            <p>
+              No faiss, no PyTorch, no native build step. Pure TypeScript,
+              small enough to read in an afternoon.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">&#10003;</div>
+            <h3>Validated against faiss</h3>
+            <p>
+              Tested against the real Python reference implementation across
+              low- and high-dimensional fixtures — not a guess at the paper.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">&#9889;</div>
+            <h3>Fewer epochs, same loss</h3>
+            <p>
+              An EMA-based mini-batch update reaches k-means-quality
+              clustering in a fraction of the passes over your data.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">&#8982;</div>
+            <h3>Runs where faiss can't</h3>
+            <p>
+              Cloudflare Workers, Vercel Edge Functions, the browser —
+              anywhere JavaScript runs, no native deps required.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">TS</div>
+            <h3>TypeScript-native API</h3>
+            <p>
+              Flat <code>Float32Array</code> in, typed cluster assignments
+              out. No framework glue, no adapters to learn.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">&#128275;</div>
+            <h3>Honest, not hyped</h3>
+            <p>
+              We don't claim to match faiss's GPU wall-clock speed — only the
+              real algorithmic win, benchmarked openly.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-section" id="demo">
+      <div class="shell section-inner">
+        <h2>Watch it cluster</h2>
+        <p class="section-lede">
+          Real word embeddings from Shakespeare's complete works, clustered
+          live in your browser. Same data, same number of clusters, same
+          initialization — e-means just gets there in fewer passes.
+        </p>
+        <div id="app"></div>
+      </div>
+    </section>
+
+    <section class="benchmarks" id="benchmarks">
+      <div class="shell section-inner">
+        <h2>The numbers</h2>
+        <p class="section-lede">
+          e-means (5 epochs) vs. this package's own Lloyd's k-means (run to
+          convergence, up to 25 epochs), same k-means++ initialization, on
+          the 592-word / 50-dimension Shakespeare embeddings used in the demo
+          above.
+        </p>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <span class="stat-value">&le; 2.5%</span>
+            <span class="stat-label">loss difference vs. k-means</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">5</span>
+            <span class="stat-label">epochs needed (vs. 21&ndash;23)</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">1&ndash;3&times;</span>
+            <span class="stat-label">faster wall-clock</span>
+          </div>
+        </div>
+        <p class="benchmark-note">
+          Full methodology and additional benchmarks are in the
+          <a
+            href="https://github.com/TODO-set-after-repo-creation/e-means-ts#benchmarks"
+            >README</a
+          >. These numbers are honest: we don't claim to match faiss's
+          CUTLASS/GPU wall-clock speed, only the algorithmic win — reaching
+          the same loss in far fewer passes over the data.
+        </p>
+      </div>
+    </section>
+
+    <section class="usage" id="usage">
+      <div class="shell section-inner">
+        <h2>Works with your stack</h2>
+        <p class="section-lede">
+          e-means has no framework dependencies — it takes
+          <code>Float32Array</code> vectors in and returns cluster
+          assignments out. Here's how that looks with the tools people most
+          often pair with embeddings.
+        </p>
+        <div class="code-tabs">
+          <div class="code-tab-buttons" role="tablist">
+            <button class="code-tab-btn active" data-code-tab="node" type="button">Node.js</button>
+            <button class="code-tab-btn" data-code-tab="langchain" type="button">LangChain.js</button>
+            <button class="code-tab-btn" data-code-tab="llamaindex" type="button">LlamaIndex.TS</button>
+            <button class="code-tab-btn" data-code-tab="vercel" type="button">Vercel AI SDK</button>
+            <button class="code-tab-btn" data-code-tab="edge" type="button">Cloudflare Workers</button>
+            <button class="code-tab-btn" data-code-tab="browser" type="button">Browser</button>
+            <button class="code-tab-btn" data-code-tab="deno" type="button">Deno</button>
+            <button class="code-tab-btn" data-code-tab="ivf" type="button">Vector index (IVF)</button>
+          </div>
+          <div class="code-tab-panels">
+            <pre class="code-tab-panel active" data-code-panel="node"><button class="copy-btn code-copy-btn" type="button" aria-label="Copy code">Copy</button><code>import { fit } from 'e-means'
+
+const embeddings = await embedAllChunks(chunks) // however you already embed
+const flat = new Float32Array(embeddings.flat())
+const { labels, centroids } = fit(flat, embeddingDim, k)</code></pre>
+            <pre class="code-tab-panel" data-code-panel="langchain"><button class="copy-btn code-copy-btn" type="button" aria-label="Copy code">Copy</button><code>import { OpenAIEmbeddings } from '@langchain/openai'
+import { fit } from 'e-means'
+
+const embeddings = new OpenAIEmbeddings()
+const vectors = await embeddings.embedDocuments(docs.map((d) => d.pageContent))
+const flat = new Float32Array(vectors.flat())
+const { labels } = fit(flat, vectors[0].length, k)
+// group docs[i] by labels[i] before building your chain/prompt</code></pre>
+            <pre class="code-tab-panel" data-code-panel="llamaindex"><button class="copy-btn code-copy-btn" type="button" aria-label="Copy code">Copy</button><code>import { OpenAIEmbedding } from 'llamaindex'
+import { fit } from 'e-means'
+
+const embedModel = new OpenAIEmbedding()
+const vectors = await Promise.all(
+  nodes.map((n) => embedModel.getTextEmbedding(n.text))
+)
+const flat = new Float32Array(vectors.flat())
+const { labels } = fit(flat, vectors[0].length, k)</code></pre>
+            <pre class="code-tab-panel" data-code-panel="vercel"><button class="copy-btn code-copy-btn" type="button" aria-label="Copy code">Copy</button><code>import { openai } from '@ai-sdk/openai'
+import { embedMany } from 'ai'
+import { fit } from 'e-means'
+
+const { embeddings } = await embedMany({
+  model: openai.embedding('text-embedding-3-small'),
+  values: documents,
+})
+const flat = new Float32Array(embeddings.flat())
+const { labels } = fit(flat, embeddings[0].length, k)</code></pre>
+            <pre class="code-tab-panel" data-code-panel="edge"><button class="copy-btn code-copy-btn" type="button" aria-label="Copy code">Copy</button><code>export default {
+  async fetch(request: Request): Promise&lt;Response&gt; {
+    const { vectors, k } = await request.json()
+    const { fit } = await import('e-means')
+    const flat = new Float32Array(vectors.flat())
+    const { labels } = fit(flat, vectors[0].length, k)
+    return Response.json({ labels: Array.from(labels) })
+  },
+}</code></pre>
+            <pre class="code-tab-panel" data-code-panel="browser"><button class="copy-btn code-copy-btn" type="button" aria-label="Copy code">Copy</button><code>import { runInWorker } from 'e-means'
+
+// runs off the main thread; requires an ESM-aware bundler (Vite, webpack 5+)
+const { labels, centroids } = await runInWorker('emeans', flat, dim, k)</code></pre>
+            <pre class="code-tab-panel" data-code-panel="deno"><button class="copy-btn code-copy-btn" type="button" aria-label="Copy code">Copy</button><code>import { fit } from 'npm:e-means'</code></pre>
+            <pre class="code-tab-panel" data-code-panel="ivf"><button class="copy-btn code-copy-btn" type="button" aria-label="Copy code">Copy</button><code>import { fit } from 'e-means'
+
+const { centroids, labels } = fit(allEmbeddings, dim, numPartitions)
+// store labels[i] as a partition_id column alongside embedding i,
+// and centroids as your partition lookup table</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <div>
+          <strong>e-means</strong> &middot; MIT License
+          <p>
+            Ported from
+            <a
+              href="https://github.com/facebookresearch/faiss/tree/main/contrib/e_means"
+              >faiss/contrib/e_means</a
+            >, based on the paper by Bessa et al. (Meta FAIR).
+          </p>
+        </div>
+        <div class="footer-links">
+          <a href="https://github.com/TODO-set-after-repo-creation/e-means-ts"
+            >GitHub</a
+          >
+          <a href="https://www.npmjs.com/package/e-means">npm</a>
+          <a href="https://arxiv.org/abs/2611.09501">Paper</a>
+        </div>
+      </div>
+    </footer>
+
     <div id="tooltip" hidden></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
