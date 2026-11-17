@@ -1,0 +1,45 @@
+{
+  "name": "e-means",
+  "version": "0.1.0",
+  "description": "Zero-dependency TypeScript port of e-means (Meta FAIR's mini-batch replacement for k-means) plus a Lloyd's k-means baseline. Runs in Node, browsers, Cloudflare Workers, Vercel Edge Functions, and Deno.",
+  "keywords": [
+    "e-means",
+    "k-means",
+    "clustering",
+    "machine-learning",
+    "vector-search",
+    "embeddings",
+    "typescript",
+    "javascript",
+    "edge",
+    "cloudflare-workers",
+    "vercel",
+    "web-worker",
+    "rag"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "bench": "tsx bench/run.ts"
+  },
+  "devDependencies": {
+    "ml-kmeans": "^7.0.0",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}
