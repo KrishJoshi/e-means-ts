@@ -45,7 +45,7 @@ export function kmeans(
   const allIndices = new Int32Array(n)
   for (let i = 0; i < n; i++) allIndices[i] = i
 
-  let labels = new Int32Array(n)
+  let labels: Int32Array = new Int32Array(n)
   let loss = Infinity
   let epoch = 0
   for (; epoch < maxEpochs; epoch++) {
