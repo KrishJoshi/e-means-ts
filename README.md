@@ -117,7 +117,7 @@ CUTLASS-accelerated wall-clock speed — see the note at the top of this
 README; the comparison here is algorithmic (epochs/loss) plus this
 package's own honest wall-clock numbers.
 
-[Live demo: Shakespeare word-cloud race](https://TODO-set-after-repo-creation.github.io/e-means-ts/) <!-- TODO: fill in real URL after Task 14 creates the GitHub repo -->
+[Live demo: Shakespeare word-cloud race](https://krishj.com/e-means-ts/)
 
 ## Using it alongside your stack
 

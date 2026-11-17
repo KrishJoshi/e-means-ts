@@ -21,11 +21,11 @@
   "author": "Krish",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TODO-set-after-repo-creation/e-means-ts.git"
+    "url": "git+https://github.com/KrishJoshi/e-means-ts.git"
   },
-  "homepage": "https://github.com/TODO-set-after-repo-creation/e-means-ts#readme",
+  "homepage": "https://github.com/KrishJoshi/e-means-ts#readme",
   "bugs": {
-    "url": "https://github.com/TODO-set-after-repo-creation/e-means-ts/issues"
+    "url": "https://github.com/KrishJoshi/e-means-ts/issues"
   },
   "type": "module",
   "main": "./dist/index.cjs",
