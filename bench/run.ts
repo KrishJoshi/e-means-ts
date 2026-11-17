@@ -32,7 +32,7 @@ function run(n: number, dim: number, k: number): void {
   const data = makeBlobs(n, dim, k, 1)
 
   const emeansStart = performance.now()
-  const emeansResult = fit(data, dim, k, { seed: 1, nepochs: 5 })
+  const emeansResult = fit(data, dim, k, { seed: 1, nepochs: 5, init: 'kmeans++' })
   const emeansMs = performance.now() - emeansStart
 
   const kmeansStart = performance.now()

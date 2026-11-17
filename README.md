@@ -69,11 +69,17 @@ epochs) vs. this package's own `kmeans` (25 epochs, Lloyd's) vs.
 [`ml-kmeans`](https://www.npmjs.com/package/ml-kmeans) (25 iterations),
 on synthetic blob data, Node.js:
 
+Both `fit()` and `kmeans()` are run with `init: 'kmeans++'` here for a fair
+apples-to-apples comparison (both algorithms start from the same quality of
+initial centroids; an earlier version of this table used `fit()`'s
+random-row-init default, which on this synthetic dataset can collide two
+centroids into the same blob and makes e-means look far worse than it is):
+
 | n | dim | k | e-means | kmeans (ours) | ml-kmeans |
 |---|-----|---|---------|----------------|-----------|
-| 10,000 | 32 | 10 | 19.8ms, 5 epochs, loss=3,231,379.8 | 11.1ms, 2 epochs, loss=26,760.8 | 79.2ms, 2 iterations, converged |
-| 100,000 | 32 | 20 | 311.5ms, 5 epochs, loss=32,274,416.7 | 228.4ms, 2 epochs, loss=267,839.1 | 1,368.3ms, 2 iterations, converged |
-| 1,000,000 | 32 | 50 | 6,722.8ms, 5 epochs, loss=386,683,936.5 | 3,824.8ms, 2 epochs, loss=2,678,557.0 | 53,236.7ms, 2 iterations, converged |
+| 10,000 | 32 | 10 | 26.5ms, 5 epochs, loss=26,825.0 | 10.1ms, 2 epochs, loss=26,760.8 | 78.2ms, 2 iterations, converged |
+| 100,000 | 32 | 20 | 348.7ms, 5 epochs, loss=267,986.1 | 147.3ms, 2 epochs, loss=267,839.1 | 1,252.6ms, 2 iterations, converged |
+| 1,000,000 | 32 | 50 | 7,796.8ms, 5 epochs, loss=2,678,994.1 | 3,654.6ms, 2 epochs, loss=2,678,557.0 | 49,033.0ms, 2 iterations, converged |
 
 The comparison is algorithmic (epochs/loss), not a claim of matching
 faiss's CUTLASS-accelerated wall-clock speed — see the note at the top of
