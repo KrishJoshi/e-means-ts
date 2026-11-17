@@ -88,3 +88,53 @@ with open("test/fixtures/emeans-faiss-reference-hard.json", "w") as f:
 print("Wrote test/fixtures/emeans-faiss-reference-hard.json")
 print("Hard loss per epoch:", hard_fixture["lossPerEpoch"])
 print("Hard cluster usage counts:", np.bincount(hard_labels, minlength=hard_k))
+
+# --- High-dim fixture (exercises the 'throughput' batch-law branch) --------
+# resolveBatchLaw('auto', dim) in src/emeansSchedule.ts picks 'quality' for
+# dim <= AUTO_QUALITY_MAX_D (16) and 'throughput' above that, independent of
+# n. Both fixtures above are dim=2 and dim=8, so neither ever exercises the
+# 'throughput' branch -- yet every realistic embedding dimension the README
+# advertises (50-3072) runs exclusively through 'throughput'. This fixture
+# uses dim=32 (> 16, so 'throughput' is selected unconditionally) with the
+# same "meaningfully overlapping" cluster design as the hard fixture above
+# (not ~40-sigma separated) and k=8 (> true cluster count) so dead-cluster
+# revival is active (dim=32 > NO_REVIVAL_MAX_D) and n is large enough for
+# multiple mini-batches per epoch at the batch sizes resolveRecipe computes
+# for this (n, k, nepochs) under the throughput law.
+highdim_dim = 32
+highdim_k_true = 6
+highdim_noise_std = 0.8
+highdim_center_scale = 0.3
+highdim_n_per_cluster = 200
+highdim_k = 8
+
+highdim_rng = np.random.RandomState(42)
+highdim_centers = highdim_rng.normal(
+    scale=highdim_center_scale, size=(highdim_k_true, highdim_dim)
+).astype("float32")
+highdim_data = np.concatenate(
+    [
+        c + highdim_rng.normal(scale=highdim_noise_std, size=(highdim_n_per_cluster, highdim_dim)).astype("float32")
+        for c in highdim_centers
+    ]
+)
+
+highdim_model = NumpyEmeans(d=highdim_dim, k=highdim_k, nepochs=5, seed=42)
+highdim_centroids, highdim_labels = highdim_model.train(highdim_data)
+
+highdim_fixture = {
+    "data": highdim_data.tolist(),
+    "dim": highdim_dim,
+    "k": highdim_k,
+    "nepochs": 5,
+    "seed": 42,
+    "finalLoss": float(highdim_model.obj[-1]),
+    "lossPerEpoch": highdim_model.obj.tolist(),
+}
+
+with open("test/fixtures/emeans-faiss-reference-highdim.json", "w") as f:
+    json.dump(highdim_fixture, f, indent=2)
+
+print("Wrote test/fixtures/emeans-faiss-reference-highdim.json")
+print("High-dim loss per epoch:", highdim_fixture["lossPerEpoch"])
+print("High-dim cluster usage counts:", np.bincount(highdim_labels, minlength=highdim_k))

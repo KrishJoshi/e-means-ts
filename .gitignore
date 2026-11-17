@@ -4,3 +4,4 @@ dist
 .DS_Store
 demo/dist
 demo/scripts/.cache
+.venv-bench
