@@ -1,5 +1,4 @@
 import { fit, kmeans } from 'e-means'
-import shakespeareData from './data/shakespeare-embeddings.json'
 
 interface WordPoint {
   word: string
@@ -28,9 +27,18 @@ interface Frame {
   done: boolean
 }
 
-const shakespearePoints = shakespeareData as WordPoint[]
-const shakespeareDim = shakespearePoints[0].vector.length
-const shakespeareFlat = new Float32Array(shakespearePoints.flatMap((p) => p.vector))
+let shakespeareCache: { points: WordPoint[]; dim: number; flat: Float32Array } | null = null
+
+async function loadShakespeareData(): Promise<{ points: WordPoint[]; dim: number; flat: Float32Array }> {
+  if (shakespeareCache) return shakespeareCache
+  const url = `${import.meta.env.BASE_URL}data/shakespeare-embeddings.json`
+  const response = await fetch(url)
+  const points = (await response.json()) as WordPoint[]
+  const dim = points[0].vector.length
+  const flat = new Float32Array(points.flatMap((p) => p.vector))
+  shakespeareCache = { points, dim, flat }
+  return shakespeareCache
+}
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 app.innerHTML = `
@@ -40,7 +48,7 @@ app.innerHTML = `
   </nav>
   <section id="shakespeare-tab">
     <button id="run-shakespeare">Run the race</button>
-    <p id="shakespeare-loading" class="loading-note" hidden>Computing ${shakespearePoints.length.toLocaleString()} points&hellip;</p>
+    <p id="shakespeare-loading" class="loading-note" hidden>Loading dataset&hellip;</p>
     <div class="race">
       <div class="panel">
         <h2>e-means</h2>
@@ -320,7 +328,7 @@ interface RaceConfig {
   slider: string
   playBtn: string
   epochLabel: string
-  getInput: () => { flat: Float32Array; dim: number; k: number; pts: PlotPoint[] }
+  getInput: () => Promise<{ flat: Float32Array; dim: number; k: number; pts: PlotPoint[] }>
 }
 
 function setupRace(cfg: RaceConfig): void {
@@ -390,34 +398,37 @@ function setupRace(cfg: RaceConfig): void {
     }, PLAY_INTERVAL_MS)
   })
 
-  runBtn.addEventListener('click', () => {
+  runBtn.addEventListener('click', async () => {
     stopPlaying()
     controls.hidden = true
     loadingNote.hidden = false
     runBtn.disabled = true
+
+    const input = await cfg.getInput()
+
+    loadingNote.textContent = `Computing ${input.pts.length.toLocaleString()} points…`
     // Let the "computing" note paint before the (possibly multi-hundred-ms) synchronous work.
-    window.setTimeout(() => {
-      const input = cfg.getInput()
-      pts = input.pts
-      const bounds = computeBounds(pts)
-      positions = pts.map((p) => project(p, bounds, emeansCanvas.width, emeansCanvas.height))
-      attachHover(emeansCanvas, pts, positions)
-      attachHover(kmeansCanvas, pts, positions)
+    await new Promise((resolve) => window.setTimeout(resolve, 20))
 
-      const frames = computeFrames(input.flat, input.dim, input.k)
-      emeansFrames = frames.emeansFrames
-      kmeansFrames = frames.kmeansFrames
-      emeansMs = frames.emeansMs
-      kmeansMs = frames.kmeansMs
+    pts = input.pts
+    const bounds = computeBounds(pts)
+    positions = pts.map((p) => project(p, bounds, emeansCanvas.width, emeansCanvas.height))
+    attachHover(emeansCanvas, pts, positions)
+    attachHover(kmeansCanvas, pts, positions)
 
-      slider.min = '1'
-      slider.max = String(frames.maxFrame)
-      slider.value = '1'
-      loadingNote.hidden = true
-      controls.hidden = false
-      runBtn.disabled = false
-      showFrame(0)
-    }, 20)
+    const frames = computeFrames(input.flat, input.dim, input.k)
+    emeansFrames = frames.emeansFrames
+    kmeansFrames = frames.kmeansFrames
+    emeansMs = frames.emeansMs
+    kmeansMs = frames.kmeansMs
+
+    slider.min = '1'
+    slider.max = String(frames.maxFrame)
+    slider.value = '1'
+    loadingNote.hidden = true
+    controls.hidden = false
+    runBtn.disabled = false
+    showFrame(0)
   })
 }
 
@@ -442,12 +453,15 @@ setupRace({
   slider: '#shakespeare-epoch-slider',
   playBtn: '#shakespeare-play-btn',
   epochLabel: '#shakespeare-epoch-label',
-  getInput: () => ({
-    flat: shakespeareFlat,
-    dim: shakespeareDim,
-    k: 14,
-    pts: shakespearePoints.map((p) => ({ word: p.word, x: p.x, y: p.y })),
-  }),
+  getInput: async () => {
+    const { points, dim, flat } = await loadShakespeareData()
+    return {
+      flat,
+      dim,
+      k: 14,
+      pts: points.map((p) => ({ word: p.word, x: p.x, y: p.y })),
+    }
+  },
 })
 
 setupRace({
@@ -461,7 +475,7 @@ setupRace({
   slider: '#custom-epoch-slider',
   playBtn: '#custom-play-btn',
   epochLabel: '#custom-epoch-label',
-  getInput: () => {
+  getInput: async () => {
     const raw = (document.querySelector('#custom-input') as HTMLTextAreaElement).value
     const k = Number((document.querySelector('#custom-k') as HTMLInputElement).value)
     const vectors: number[][] = JSON.parse(raw)

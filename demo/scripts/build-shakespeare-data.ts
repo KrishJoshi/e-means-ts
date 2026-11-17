@@ -86,6 +86,13 @@ function projectTo2D(vectors: number[][]): { x: number; y: number }[] {
   }))
 }
 
+// GloVe ships ~6 significant figures; 4 decimal places keeps clustering
+// behavior indistinguishable while cutting the shipped payload roughly
+// in half versus full float precision.
+function round(n: number): number {
+  return Math.round(n * 10000) / 10000
+}
+
 async function main(): Promise<void> {
   const text = readFileSync('scripts/.cache/shakespeare.txt', 'utf-8')
   const candidates = topWords(text)
@@ -96,13 +103,14 @@ async function main(): Promise<void> {
 
   const output = words.map((word, i) => ({
     word,
-    vector: vectors[i],
-    x: projected[i].x,
-    y: projected[i].y,
+    vector: vectors[i].map(round),
+    x: round(projected[i].x),
+    y: round(projected[i].y),
   }))
 
-  writeFileSync('src/data/shakespeare-embeddings.json', JSON.stringify(output))
-  console.log(`Wrote ${output.length} words to src/data/shakespeare-embeddings.json`)
+  const outPath = 'public/data/shakespeare-embeddings.json'
+  writeFileSync(outPath, JSON.stringify(output))
+  console.log(`Wrote ${output.length} words to ${outPath}`)
 }
 
 main()
