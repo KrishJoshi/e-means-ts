@@ -78,16 +78,29 @@ not a bug in this port.
 
 ## Benchmarks
 
-Epochs and wall-clock time to reach a stable clustering, `e-means` (5
-epochs) vs. this package's own `kmeans` (25 epochs, Lloyd's) vs.
-[`ml-kmeans`](https://www.npmjs.com/package/ml-kmeans) (25 iterations),
-on synthetic blob data, Node.js:
+### Real embeddings (the actual use case)
 
-Both `fit()` and `kmeans()` are run with `init: 'kmeans++'` here for a fair
-apples-to-apples comparison (both algorithms start from the same quality of
-initial centroids; an earlier version of this table used `fit()`'s
-random-row-init default, which on this synthetic dataset can collide two
-centroids into the same blob and makes e-means look far worse than it is):
+`e-means` (5 epochs) vs. this package's own `kmeans` (Lloyd's, run to
+convergence) on the 592-word / 50-dimension Shakespeare embeddings used in
+the live demo (linked below), both with `init: 'kmeans++'`, Node.js:
+
+| k | e-means | kmeans (ours) | loss ratio | speedup |
+|---|---------|----------------|------------|---------|
+| 8 | 5 epochs, 5.0ms, loss=6,757.8 | 23 epochs, 5.1ms, loss=6,752.8 | 1.001 | 1.0x |
+| 16 | 5 epochs, 3.2ms, loss=6,156.9 | 22 epochs, 9.3ms, loss=6,006.5 | 1.025 | 2.9x |
+| 24 | 5 epochs, 4.3ms, loss=5,679.5 | 21 epochs, 12.9ms, loss=5,676.3 | 1.001 | 3.0x |
+
+e-means matches k-means's loss within 0.1–2.5% using roughly a quarter of
+the epochs, and comes out ahead on wall-clock once there's enough data per
+epoch for the mini-batching to pay for itself (small `k`/small data favors
+plain Lloyd's, since it has less per-epoch overhead to begin with).
+
+### Synthetic blobs (a harder case for e-means, included for transparency)
+
+On well-separated synthetic blobs, Lloyd's k-means converges in as few as
+2 epochs — there's no ambiguity for it to resolve, so there's little room
+for a smarter update rule to win on *epochs*, though e-means still reaches
+essentially the same loss:
 
 | n | dim | k | e-means | kmeans (ours) | ml-kmeans |
 |---|-----|---|---------|----------------|-----------|
@@ -95,9 +108,14 @@ centroids into the same blob and makes e-means look far worse than it is):
 | 100,000 | 32 | 20 | 348.7ms, 5 epochs, loss=267,986.1 | 147.3ms, 2 epochs, loss=267,839.1 | 1,252.6ms, 2 iterations, converged |
 | 1,000,000 | 32 | 50 | 7,796.8ms, 5 epochs, loss=2,678,994.1 | 3,654.6ms, 2 epochs, loss=2,678,557.0 | 49,033.0ms, 2 iterations, converged |
 
-The comparison is algorithmic (epochs/loss), not a claim of matching
-faiss's CUTLASS-accelerated wall-clock speed — see the note at the top of
-this README.
+Both tables run `fit()` and `kmeans()` with the same `init: 'kmeans++'` for
+a fair apples-to-apples comparison — an earlier version of the synthetic
+table used `fit()`'s random-row-init default, which on well-separated
+blobs can collide two centroids into the same blob and makes e-means look
+far worse than it is. Neither table claims to match faiss's
+CUTLASS-accelerated wall-clock speed — see the note at the top of this
+README; the comparison here is algorithmic (epochs/loss) plus this
+package's own honest wall-clock numbers.
 
 [Live demo: Shakespeare word-cloud race](https://TODO-set-after-repo-creation.github.io/e-means-ts/) <!-- TODO: fill in real URL after Task 14 creates the GitHub repo -->
 
