@@ -57,10 +57,24 @@ Assigns new points to the nearest centroid from a previous `fit`/`kmeans` call.
 
 Runs `fit` or `kmeans` in a Web Worker so browser callers don't block the
 main thread. Requires a bundler that supports `new URL(..., import.meta.url)`
-worker syntax (Vite, webpack 5+).
+worker syntax (Vite, webpack 5+) -- it is not usable from a plain CJS
+`require()`/Node entry point, since CJS has no `import.meta.url` to resolve
+the worker file from. Call `fit()`/`kmeans()` directly for CJS/Node use.
+
+**Note:** `runInWorker` transfers `data`'s underlying `ArrayBuffer` to the
+worker; the array becomes unusable in the caller afterward (and if `data` is
+a `.subarray()` view, the *entire* backing buffer is detached, not just the
+view). Pass a copy (`data.slice()`) if you need the original array again,
+e.g. for a later `predict()` call.
 
 `ClusterResult`: `{ centroids: Float32Array, labels: Int32Array, loss:
-number, epochs: number }`.
+number, epochs: number }`. Note that `labels` reflects each point's
+assignment from the last epoch's streaming mini-batch pass against the
+centroids *as they were during that epoch* (computed before the final
+`finalize()` averaging step), so `predict(data, dim, result.centroids)` can
+disagree with `result.labels` on a handful of points near cluster
+boundaries. This is faithful to the real faiss e-means algorithm's behavior,
+not a bug in this port.
 
 ## Benchmarks
 
